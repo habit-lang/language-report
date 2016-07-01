@@ -1,0 +1,96 @@
+This file is a TODO list for eventual updates to the Habit language report:
+
+- In the treatment of type synonyms, there should be functional dependencies
+  in both directions.  In addition, we now add a trailing fails clause to
+  the generated instance.  For example, a type synonym like:
+
+    type T a = t
+
+  is now translated as follows (with a fresh variable v):
+
+    class T a v | a -> v, v -> a  -- <<< Second dependency is new
+    instance T a = t
+    else     T a = v fails        -- <<< New
+
+- In a similar way, we now add trailing fails clauses to generated BitSize
+  and ByteSize instances; this prevents a programmer from defining bogus
+  sizes.  As an example, the definition:
+
+    bitdata T/16 = K [ x :: Bit 2 ]
+
+  would generate an instance:
+
+    instance BitSize T = 16 if BitSize (Bit 2) = 16
+
+  This is clearly invalid, but nothing would prevent a user from then
+  adding an unsound (but non-overlapping) instance to "correct" this:
+
+    instance BitSize T = 16 if BitSize (Bit 2) = 16
+
+  Extending the original instance with an additional "else ... fails"
+  will prevent the user from adding this unsound instance, and will
+  ensure that the original, incorrect instance is left in place to
+  trigger the appropriate error diagnostics.
+
+- On the other hand, we have reversed the decision to include trailing
+  "fails" clauses on "Select" and "Update" instances for bitdata and
+  structure types.  This allows us to create "synthetic" fields.
+
+- Kind polymorphism is now supported.
+
+- The Lab and Nat types have been replaced by the more general Proxy
+  type constructor.  For any type t, there is a corresponding singleton
+  type, Proxy t, which can also be written as #t, whose only value is
+  also written as #t.  String literals, such as "next" are now used in
+  type expressions as types of kind lab (the previous syntax for the
+  same label was #.next), while integer literals continue to be treated
+  as types of kind nat.  The old Lab f and Nat n types are now replaced
+  by #f and #n, respectively.  The corresponding syntax for expressions
+  allows terms such as #"next" and #1 of types #"next" and #1,
+  respectively.  (There was previously no way to create values with
+  types of the form Nat n in Habit syntax; such values could only be
+  introduced indirectly by writing a numeric literal that is translated
+  into a call to fromLiteral with a Nat argument.  I don't think there
+  is any problem with providing an expression level syntax for Nat
+  values, but we might want to think about this, just to be sure ...)
+
+- There is a restriction in the syntax for defining infix type constructor
+  operators; it must be possible to figure out which is the type constructor
+  operator without having to consider fixity information.
+
+- The report doesn't mention the Proc class and its relationship to the
+  Monad class and the use of do notation.
+
+- It turns out that it's useful to generalize the caseFrom and ifFrom
+  syntax to allow binding of a variable to the result that is produced
+  by the monadic computation, as in:  case x <- e of ...  or
+  if v <- e then ... else ...
+
+- Make the parentheses around the list of classes in a deriving clause
+  optional.
+
+- Decided not to support deriving BitManip for datatypes because I'm
+  not sure it makes sense there.  (In particular, datatypes do not
+  typically have BitSize instances.) Still ok for bitdata.
+
+- Allow deriving for Bounded on enumerations and single constructor
+  datatypes (as in Haskell) and not just single constructor, single
+  argument types.  Similarly for single constructor, single field
+  bitdata types.
+
+- Comment that derived equality on bitdata types is bitwise comparison.
+
+- Only allow derived instances of Ord on bitdata for single constructor,
+  single field types.
+
+- Add "compare :: a -> a -> Ordering" to the Ord class, as in Haskell,
+  with associated default methods.
+
+- Make Maybe an instance of the Monad and Proc classes.
+
+In the category of things that we're not planning to document in the
+report:
+
+- The "requires ..." syntax that is supported by the implementation is
+  not currently expected to become an official part of the language.
+
