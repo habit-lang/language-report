@@ -1,11 +1,10 @@
-#! runhugs
+#! runhaskell
 
 This file contains code for extracting language.tex and prelude.lhb
 from the language report sources in language.src.
 
-> import Char
-> import System
-> import IO
+> import Data.Char
+> import System.IO
 
 > main = do "language.src" `toLatex` "language.tex"
 >           "language.src" `toCode`  "prelude.lhb"
@@ -62,28 +61,28 @@ What are the specifics for generating a LaTeX file?
 >    end    = out "\\end{Verbatim}"
 >    blank  = out ""
 >    lit s  = out s
->
+
 >    -- in regular text:
 >    intext []             = return ()
 >    intext (Text s : ls)  = text s >> intext ls
 >    intext (Blank  : ls)  = textblank ls
 >    intext (Lit  s : ls)  = begin >> lit s >> incode ls
 >    intext (Code s : ls)  = intext ls
->
+
 >    -- blanks appearing in text:
 >    textblank []            = blank
 >    textblank (Text s : ls) = blank >> text s >> intext ls
 >    textblank (Blank  : ls) = blank >> textblank ls
 >    textblank (Lit  s : ls) = begin >> lit s >> incode ls
 >    textblank (Code s : ls) = textblank ls
->
+
 >    -- in code lines:
 >    incode []            = end
 >    incode (Text s : ls) = end >> text s >> intext ls
 >    incode (Blank  : ls) = codeblank ls
 >    incode (Lit  s : ls) = lit s >> incode ls
 >    incode (Code s : ls) = incode ls
->
+
 >    -- blanks appearing in code:
 >    codeblank []            = end
 >    codeblank (Text s : ls) = end   >> text s >> intext ls
@@ -107,32 +106,31 @@ in the first place.
 >    code ('>':s) = lit s
 >    code (':':s) = out s
 >    code other   = out other
->
+
 >    -- in regular text:
 >    intext []             = return ()
 >    intext (Text s : ls)  = intext ls
 >    intext (Blank  : ls)  = textblank ls
 >    intext (Lit  s : ls)  = lit s >> incode ls
 >    intext (Code s : ls)  = code s >> incode ls
->
+
 >    -- blanks appearing in text:
 >    textblank []            = return ()
 >    textblank (Text s : ls) = intext ls
 >    textblank (Blank  : ls) = textblank ls
 >    textblank (Lit  s : ls) = blank >> lit s >> incode ls
 >    textblank (Code s : ls) = blank >> code s >> incode ls
->
+
 >    -- in code lines:
 >    incode []            = return ()
 >    incode (Text s : ls) = blank >> intext ls
 >    incode (Blank  : ls) = codeblank ls
 >    incode (Lit  s : ls) = lit s >> incode ls
 >    incode (Code s : ls) = code s >> incode ls
->
+
 >    -- blanks appearing in code:
 >    codeblank []            = return ()
 >    codeblank (Text s : ls) = intext ls
 >    codeblank (Blank  : ls) = codeblank ls
 >    codeblank (Lit  s : ls) = blank >> lit s >> incode ls
 >    codeblank (Code s : ls) = blank >> code s >> incode ls
-
