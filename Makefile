@@ -7,7 +7,7 @@ all:	language.pdf
 language.pdf: language.tex language.ind language.bbl
 
 language.tex:	language.src
-	runhugs build.lhs
+	ghc build.lhs
 
 .tex.pdf:
 	pdflatex $*
