@@ -1344,8 +1344,8 @@ fields.  The mechanisms that are used to ensure correct usage of field
 names in Habit are described in Section~\ref{sec-dotnotation}.  As a
 special case, if the target in an update expression is a bitdata
 constructor name, then the update is interpreted instead as bitdata
-construction.  For example, !B[x=0|y=1]! constructs a bitdata value,
-assuming that !B! has been declared elsewhere in the program as a
+construction.  For example, !BC[x=0|y=1]! constructs a bitdata value,
+assuming that !BC! has been declared elsewhere in the program as a
 bitdata constructor with appropriately typed fields !x! and !y!.
 
 Finally, Habit provides special syntax for describing structure
@@ -1565,9 +1565,9 @@ interpretation as they do in Haskell:
       !pn!.  (Of course, the type system ensures that there are exactly
       the same number of pattern and value components in any such match.)
 
-\item A pattern !B [ f1 | ... | fn ]!, where !B! is a constructor
+\item A pattern !BC [ f1 | ... | fn ]!, where !BC! is a constructor
       function of a bitdata type (see Section~\ref{sec-bitdata}), will
-      match any value that can be produced by the !B! constructor, so
+      match any value that can be produced by the !BC! constructor, so
       long as each of the individual field specifications, !f1!,
       \ldots, !fn!, are also matched.  Each field specification is
       either a field name paired with a pattern, !x = p!, or just
@@ -1579,11 +1579,11 @@ interpretation as they do in Haskell:
       within the scope of the pattern.  (This is sometimes referred to
       as {\em punning} because the same identifer string is used as
       both a field label and a variable name.) In both
-      cases, the name !x! must be a valid field name for the !B!
+      cases, the name !x! must be a valid field name for the !BC!
       constructor.  A bitdata pattern may not name the same field more
       than once, but it is not necessary to list the fields in the same
       order as they appear in the original !bitdata! definition, or to
-      list all of the fields for !B!; any fields that
+      list all of the fields for !BC!; any fields that
       are not mentioned will be treated as if they had been
       bound by a wildcard pattern.
 
